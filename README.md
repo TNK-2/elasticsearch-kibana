@@ -4,3 +4,11 @@
 ```
 docker-compose up -d
 ```
+
+立ち上がったら 、、 
+
+## elastic search へのアクセス
+http://localhost:9200/   
+
+## kibana へのアクセス
+http://localhost:5601/
