@@ -19,6 +19,8 @@ https://medium.com/eureka-engineering/%E5%9F%BA%E7%A4%8E%E7%B7%A8-elasticsearch%
 
 https://dev.classmethod.jp/articles/elasticsearch-getting-started-07/
 
+https://dev.classmethod.jp/articles/elasticsearch-getting-started-08/
+
 ## コマンドメモ
 
 リソース作成・変更
@@ -50,19 +52,13 @@ curl -XPOST "http://localhost:9200/customer/external" \
 ```
 curl -XPOST "http://localhost:9200/test/recipes/2" \
 -H "Content-Type: application/json" \
--d @./data/basil-and-pesto-hummus.json
+-d @./data/recipes/basil-and-pesto-hummus.json
 ```
 
 リソース削除
 
 ```
 curl -XDELETE "http://localhost:9200/customer/external/2"
-```
-
-検索
-
-```
-
 ```
 
 ## バッチプロセッシング
@@ -87,5 +83,69 @@ curl -XPOST "http://localhost:9200/customer/external/_bulk" \
 {"update":{"_id":"1"}}
 {"doc": {"name": "John Doe becomes Jane Doe"}}
 {"delete":{"_id":"2"}}
+'
+```
+
+## 検索 
+
+データ挿入
+
+```
+curl -XPOST 'localhost:9200/classmethod/employees/_bulk?pretty' \
+-H "Content-Type: application/json" \
+--data-binary "@./data/employees/employees.jsonl"
+
+curl 'localhost:9200/_cat/indices?v&index=classmethod'
+```
+
+全件
+```
+curl 'localhost:9200/classmethod/employees/_search' \
+-H "Content-Type: application/json" \
+-d '
+{
+    "_source": {
+        "exclude": ["joined_date", "friends"]
+    },
+    "query": {
+        "match_all": {}
+    }
+}
+'
+```
+
+ページング
+```
+# size : 件数
+# from : (先頭から)スキップする件数
+curl 'localhost:9200/classmethod/employees/_search' \
+-H "Content-Type: application/json" \
+-d '
+{
+    "query": {
+        "match_all": {}
+    },
+    "size": 10,
+    "from": 0
+}
+'
+```
+
+フィルタリング
+
+```
+curl 'localhost:9200/classmethod/employees/_search' \
+-H "Content-Type: application/json" \
+-d '
+{
+    "_source": {
+        "include": ["employee_id", "firstname"]
+    },
+    "query": {
+        "match" : {
+            "firstname": "tammy"
+        }
+    }
+}
 '
 ```
